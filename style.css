@@ -1,0 +1,17 @@
+body{
+    background-color: #dee2e6;
+    display:flex;
+    justify-content: center;
+    align-items: center;
+    height:100vh;
+}
+#canvas{
+    background-color:#343a40 ;
+
+    width:1200px;
+    height:600px;
+    image-rendering: -moz-crisp-edges;
+  image-rendering: -webkit-crisp-edges;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
