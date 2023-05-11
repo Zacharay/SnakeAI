@@ -16,18 +16,18 @@ class App{
         this.#ctx = this.#canvas.getContext("2d");
         this.#snake =[{x:30,y:0},{x:0,y:0}];
 
-        this._render();
+        this._renderSnake();
         this._spawnApple();
         this.#path = generateHamiltonCycle(this.#n,this.#m);
 
         this.#board[this.#snake[0].y/this.#rectSize][this.#snake[0].x/this.#rectSize] = 2;
         this.#board[this.#snake[1].y/this.#rectSize][this.#snake[1].x/this.#rectSize] = 1;
-        console.log(this.#path);
-        setInterval(this._moveSnake.bind(this),100);
+
+        setInterval(this._moveSnake.bind(this),10);
         
     }
     
-    _render()
+    _renderSnake()
     {
         this.#snake.forEach(el => {
             const {x,y} = el;
@@ -49,8 +49,6 @@ class App{
             x_idx = Math.floor(Math.random()*this.#canvas.width/this.#rectSize);
             y_idx = Math.floor(Math.random()*this.#canvas.height/this.#rectSize);
         }
-        // let x_idx = 7;
-        // let y_idx = 0;
         this.#board[y_idx][x_idx]=3;
 
         const x = x_idx*this.#rectSize;
@@ -61,12 +59,6 @@ class App{
         this.#ctx.beginPath();
         this.#ctx.rect(x,y,this.#rectSize,this.#rectSize);
         this.#ctx.fill();
-    }
-    _getPath(x,y)
-    {
-        x = x/this.#rectSize;
-        y = y/this.#rectSize;
-        return this.#path[y][x];
     }
     _eatApple(head_x,head_y)
     {
@@ -81,127 +73,119 @@ class App{
         }
         return true;
     }
+    _getPath(x,y)
+    {
+        x = x/this.#rectSize;
+        y = y/this.#rectSize;
+        return this.#path[y][x];
+    }
+    _getDistance(a,b)
+    {
+        if(a<b)
+            return b-a-1;
+        return b- a -1 + (this.#n*this.#m);
+    }
     _changeDir(head_x,head_y)
     {
        
-        
         const head_val = this.#path[head_y][head_x];
         const tail_val = this._getPath(this.#snake[this.#snake.length-1].x,this.#snake[this.#snake.length-1].y);
-        let apple_val = this._getPath(this.#appleCords.x,this.#appleCords.y);
+        const apple_val = this._getPath(this.#appleCords.x,this.#appleCords.y);
         
-        const board_size = this.#n*this.#m;
+        const distToTail = this._getDistance(head_val,tail_val);
+        const distToApple = this._getDistance(head_val,apple_val);
+        
+        //maximum shortcut that we can do is distance from head to tail, 
+        //we want also to include snake length and add buffer 3
+        let legalShortcut = distToTail - this.#snake.length -3;
+        if(legalShortcut<0)legalShortcut=0;
+        
+        
+        let desiredShortcut = distToApple;
+        if(legalShortcut>desiredShortcut)
+        {
+            legalShortcut = desiredShortcut ;
+        }
+        if(desiredShortcut<0)
+            legalShortcut = 0;
 
-        if(apple_val<head_val)apple_val+=board_size;
 
-        const inPath = ((x,y)=>{
-            const nodeVal = this.#path[y][x];
-            if(head_val>tail_val){
-                    if(head_val>nodeVal&&tail_val<nodeVal)
-                    {
-                        return false;
-                    }
-                }
-                else{
-                    if(head_val>nodeVal||tail_val<nodeVal)return false;
-                    
-                }
-                return true;
-        })
-
-        const canGoRight = !this._checkCollisions(head_x+1,head_y)&&inPath(head_x+1,head_y);
-        console.log(!this._checkCollisions(head_x+1,head_y));
-        const canGoLeft = !this._checkCollisions(head_x-1,head_y)&&inPath(head_x-1,head_y);
-        const canGoDown = !this._checkCollisions(head_x,head_y+1)&&inPath(head_x,head_y)+1;
-        const canGoUp= !this._checkCollisions(head_x,head_y-1)&&inPath(head_x,head_y-1);
-        let bestDir = {};
+        const canGoRight = !this._checkCollisions(head_x+1,head_y);
+        const canGoLeft = !this._checkCollisions(head_x-1,head_y);
+        const canGoDown = !this._checkCollisions(head_x,head_y+1);
+        const canGoUp= !this._checkCollisions(head_x,head_y-1);
+        let bestDir ={};
         let dist = -Infinity;
+        
+        //from all 4 directions selecting largest but less than legal shortuc
         if(canGoRight)
         {
-            console.log("right")
-            let nodeVal = this.#path[head_y][head_x+1];
-            if(head_val>nodeVal)nodeVal+=board_size;
-            console.log(nodeVal,apple_val)
-            if(nodeVal<=apple_val&&nodeVal>dist)
+            let nodeDist = this._getDistance(head_val,this.#path[head_y][head_x+1]);
+           
+            
+            if(nodeDist<=legalShortcut&&nodeDist>dist)
             {
-                console.log("jd1");
+                
                 bestDir= {x:1,y:0};
-                dist = nodeVal;
+                dist = nodeDist;
+          
             }
         }
+       
         if(canGoLeft)
         {
-            console.log("left")
-            let nodeVal = this.#path[head_y][head_x-1];
-            if(head_val>nodeVal)nodeVal+=board_size;
+            
+            let nodeDist = this._getDistance(head_val,this.#path[head_y][head_x-1]);
+            
 
-            if(nodeVal<=apple_val&&nodeVal>dist)
+            if(nodeDist<=legalShortcut&&nodeDist>dist)
             {
-                console.log("jd2");
+               
                 bestDir= {x:-1,y:0};
-                dist = nodeVal;
+                dist = nodeDist;
             }
         }
+        
         if(canGoDown)
         {
-            console.log("down")
-            let nodeVal = this.#path[head_y+1][head_x];
-            if(head_val>nodeVal)nodeVal+=board_size;
-
-            if(nodeVal<=apple_val&&nodeVal>dist)
+            let nodeDist = this._getDistance(head_val,this.#path[head_y+1][head_x]);
+            
+           
+            if(nodeDist<=legalShortcut&&nodeDist>dist)
             {
-                console.log("jd3");
                 bestDir= {x:0,y:1};
-                dist = nodeVal;
+                dist = nodeDist;
             }
         }
         if(canGoUp)
         {
-            console.log("up")
-            let nodeVal = this.#path[head_y-1][head_x];
-            if(head_val>nodeVal)nodeVal+=board_size;
-
-            if(nodeVal<=apple_val&&nodeVal>dist)
+         
+            let nodeDist = this._getDistance(head_val,this.#path[head_y-1][head_x]);
+           
+            if(nodeDist<=legalShortcut&&nodeDist>dist)
             {
-                console.log("jd4");
+               
                 bestDir= {x:0,y:-1};
-                dist = nodeVal;
-            };
+                dist = nodeDist;
+            }
         }
-        console.log(bestDir);
-        this.#moveDir = bestDir;
         
-        // if(head_x<20-1&&nextStep==this.#path[head_y][head_x+1])
-        // {
-        //     this.#moveDir= {x:1,y:0};
-        // }
-        // if(head_x>0&&nextStep==this.#path[head_y][head_x-1])
-        // {
-        //     this.#moveDir= {x:-1,y:0};
-        // }
-        // if(head_y<20-1&&nextStep==this.#path[head_y+1][head_x])
-        // {
-        //     this.#moveDir= {x:0,y:1};
-        // }
-        // if(head_y>0&&nextStep==this.#path[head_y-1][head_x])
-        // {
-        //     this.#moveDir= {x:0,y:-1};
-            
-        // }
-
+        this.#moveDir = bestDir;
     }
     _moveSnake()
     {
-        //calculating position of the new snake head adding it to snake array and displaying it on the canvas
+        /*
+        calculating position of the new snake head adding it 
+        to snake array and displaying it on the canvas
+        */
         const {x:head_x,y:head_y} = this.#snake[0];
         const head_idx_x = head_x/this.#rectSize;
         const head_idx_y = head_y/this.#rectSize;
-        
+
+        //find the best direction for snake to go
         this._changeDir(head_idx_x,head_idx_y);
 
         
-
-        
-
         const new_head_x = head_x+this.#moveDir.x*this.#rectSize;
         const new_head_y = head_y+this.#moveDir.y*this.#rectSize;
         const new_head_idx_x = new_head_x/this.#rectSize;
