@@ -8,8 +8,7 @@ body{
 #canvas{
     background-color:#343a40 ;
 
-    width:600px;
-    height:600px;
+
     image-rendering: -moz-crisp-edges;
   image-rendering: -webkit-crisp-edges;
   image-rendering: pixelated;
