@@ -1,5 +1,8 @@
+@import url('https://fonts.googleapis.com/css2?family=Electrolize&display=swap');
+
 body{
     background-color: #dee2e6;
+    font-family: 'Press Start 2P', cursive;
     display:flex;
     justify-content: center;
     align-items: center;
@@ -13,4 +16,39 @@ body{
   image-rendering: -webkit-crisp-edges;
   image-rendering: pixelated;
   image-rendering: crisp-edges;
+}
+.container{
+  position:relative;
+}
+.btn
+{
+  cursor: pointer;
+  font-family: 'Electrolize', sans-serif;
+  font-size:64px;
+  background-color:#37b24d;
+  border:4px solid black;
+  border-radius:20px;
+  padding:24px;
+  left:50%;
+  top:50%;
+  transform: translate(-50%,-50%);
+  position:absolute;
+  z-index: 5;
+  transition: 0.2s all;
+}
+.btn:hover{
+  background-color:#40c057;
+}
+
+.overlay{
+  width:100%;
+  height:800px;
+  background-color:rgba(0, 0, 0, 0.657);
+  position: absolute;
+  top:0;
+  left:0;
+}
+.hidden
+{
+  display:none;
 }

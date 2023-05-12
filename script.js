@@ -2,30 +2,40 @@ import generateHamiltonCycle from "./hamiltonianCycleSimple.js";
 class App{
     #rectSize = 80;
     #path;
-    #appleCords={}
+    #appleCords;
     #canvas;
     #ctx;
     #n=10;
     #m=10;
-    #board = Array(this.#n).fill().map(() => Array(this.#m).fill(0));;
+    #board;
     #snake=[];
-    #moveDir={x:1,y:0};
-    
-
+    #moveDir;
+    #gameLoop;
+    #numOfEmptySquares;
     constructor(){
         this.#canvas = document.getElementById("canvas");
         this.#ctx = this.#canvas.getContext("2d");
-        this.#snake =[{x:80,y:0},{x:0,y:0}];
-        this.#path = generateHamiltonCycle(this.#n,this.#m);
-        this._printPath();
-        this._renderSnake();
-        this._spawnApple();
+        this._init();
         
+    }
+    _init()
+    {
+        this.#snake =[{x:80,y:0},{x:0,y:0}];
+        this._renderSnake();
+
+        this.#board= Array(this.#n).fill().map(() => Array(this.#m).fill(0));
         this.#board[this.#snake[0].y/this.#rectSize][this.#snake[0].x/this.#rectSize] = 2;
         this.#board[this.#snake[1].y/this.#rectSize][this.#snake[1].x/this.#rectSize] = 1;
-
-        setInterval(this._moveSnake.bind(this),50);
+        this.#moveDir = {x:1,y:0};
         
+        
+        this.#path = generateHamiltonCycle(this.#n,this.#m);        
+        this._printPath();
+        
+        this._spawnApple();
+        
+        this.#numOfEmptySquares = this.#n*this.#m-3;
+        this.#gameLoop = setInterval(this._moveSnake.bind(this),40);
     }
     _printPath()
     {
@@ -56,6 +66,7 @@ class App{
     }
     _renderSnake()
     {
+        this.#ctx.clearRect(0,0,800,800);
         this.#snake.forEach(el => {
             const {x,y} = el;
             this.#ctx.fillStyle = "#94d82d";
@@ -131,7 +142,7 @@ class App{
         let legalShortcut = distToTail - this.#snake.length -3;
         if(legalShortcut<0)legalShortcut=0;
         
-        
+
        
         let desiredShortcut = distToApple;
         if(legalShortcut>desiredShortcut)
@@ -187,39 +198,31 @@ class App{
                 dist = nodeDist;
             }
         }
-        let temp = false;
-        console.log(bestDir,this.#moveDir);
-        if(this.#moveDir.x!= bestDir.x&&bestDir.y!=this.#moveDir.y)
-        {
-            console.log('changed')
-            temp =true;
-        }
-        this.#moveDir = bestDir;
-        return temp;
+        this.#moveDir = bestDir;        
     }
+    
     _moveSnake()
     {
         /*
         calculating position of the new snake head adding it 
         to snake array and displaying it on the canvas
         */
-       
+        console.log("1");
         const {x:head_x,y:head_y} = this.#snake[0];
         const head_idx_x = head_x/this.#rectSize;
         const head_idx_y = head_y/this.#rectSize;
 
         //find the best direction for snake to go
-        const changedDir = this._changeDir(head_idx_x,head_idx_y);
-
         
         const new_head_x = head_x+this.#moveDir.x*this.#rectSize;
         const new_head_y = head_y+this.#moveDir.y*this.#rectSize;
         const new_head_idx_x = new_head_x/this.#rectSize;
         const new_head_idx_y = new_head_y/this.#rectSize;
-        
         this.#board[new_head_idx_y][new_head_idx_x]=2;
         this.#board[head_idx_y][head_idx_x]=1;
-       
+        this.#snake.unshift({x:new_head_x,y:new_head_y});
+        this._changeDir(new_head_idx_x,new_head_idx_y);
+
         if(!this._eatApple(new_head_x,new_head_y))
         {
             //making snake tail hidden
@@ -230,30 +233,43 @@ class App{
 
             this.#ctx.beginPath();
             
-            this.#ctx.clearRect(tail_x,tail_y,this.#rectSize,this.#rectSize);
+            this.#ctx.clearRect(tail_x,tail_y,this.#rectSize+2,this.#rectSize+2);
             this._fixNumber(tail_x,tail_y);
         }
         else{
+            this.#numOfEmptySquares--;
             this.#ctx.clearRect(this.#appleCords.x,this.#appleCords.y,this.#rectSize,this.#rectSize);
             this._spawnApple();
-            
-            
+            if(this.#numOfEmptySquares==0)
+            {
+                this._gameOverState();
+            }
         }
-        
-        this.#snake.unshift({x:new_head_x,y:new_head_y});
-        this.#ctx.fillStyle = "#94d82d";
+       
+        this.#ctx.fillStyle=this.#ctx.fillStyle = "#94d82d";  
         this.#ctx.beginPath();
-     
-        this.#ctx.rect(new_head_x+3,new_head_y+3,this.#rectSize-3,this.#rectSize-3)
-        //else if(this.#moveDir.x!=0)this.#ctx.rect(new_head_x,new_head_y+3,this.#rectSize,this.#rectSize-3);
-        //else this.#ctx.rect(new_head_x+3,new_head_y,this.#rectSize-3,this.#rectSize);
-        //left_right
-        
-        //up down
+        this.#ctx.rect(new_head_x+4,new_head_y+4,this.#rectSize-4,this.#rectSize-4);
         this.#ctx.fill();
         
         
-        
+    }
+    _gameOverState()
+    {
+        console.log('test');
+        clearInterval(this.#gameLoop);
+        const restartBtn = document.querySelector('.restart-btn');
+        const overlay = document.querySelector('.overlay');
+        restartBtn.classList.remove('hidden');
+        overlay.classList.remove('hidden');
+
+        //restartGame
+        restartBtn.addEventListener('click',()=>{
+            restartBtn.classList.add('hidden');
+            overlay.classList.add('hidden');
+            this._init();
+            
+            
+        })       
     }
 }
 
