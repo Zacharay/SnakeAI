@@ -20,6 +20,7 @@ class App{
     }
     _init()
     {
+        clearInterval(this.#gameLoop);
         this.#snake =[{x:80,y:0},{x:0,y:0}];
         this._renderSnake();
 
@@ -35,7 +36,7 @@ class App{
         this._spawnApple();
         
         this.#numOfEmptySquares = this.#n*this.#m-3;
-        this.#gameLoop = setInterval(this._moveSnake.bind(this),40);
+        this.#gameLoop = setInterval(this._moveSnake.bind(this),10);
     }
     _printPath()
     {
@@ -207,12 +208,11 @@ class App{
         calculating position of the new snake head adding it 
         to snake array and displaying it on the canvas
         */
-        console.log("1");
         const {x:head_x,y:head_y} = this.#snake[0];
         const head_idx_x = head_x/this.#rectSize;
         const head_idx_y = head_y/this.#rectSize;
 
-        //find the best direction for snake to go
+        
         
         const new_head_x = head_x+this.#moveDir.x*this.#rectSize;
         const new_head_y = head_y+this.#moveDir.y*this.#rectSize;
@@ -221,6 +221,8 @@ class App{
         this.#board[new_head_idx_y][new_head_idx_x]=2;
         this.#board[head_idx_y][head_idx_x]=1;
         this.#snake.unshift({x:new_head_x,y:new_head_y});
+        
+        //find the best direction for snake to go
         this._changeDir(new_head_idx_x,new_head_idx_y);
 
         if(!this._eatApple(new_head_x,new_head_y))
@@ -255,10 +257,11 @@ class App{
     }
     _gameOverState()
     {
-        console.log('test');
+      
         clearInterval(this.#gameLoop);
         const restartBtn = document.querySelector('.restart-btn');
         const overlay = document.querySelector('.overlay');
+        //show restart btn
         restartBtn.classList.remove('hidden');
         overlay.classList.remove('hidden');
 
