@@ -1,13 +1,12 @@
-import path from "./hamiltonianCycle.js";
 import generateHamiltonCycle from "./hamiltonianCycle.js";
 class App{
-    #rectSize = 80;
+    #rectSize = 40;
     #path;
     #appleCords;
     #canvas;
     #ctx;
-    #n=10;
-    #m=10;
+    #n=20;
+    #m=20;
     #board;
     #snake=[];
     #moveDir;
@@ -22,7 +21,7 @@ class App{
     _init()
     {
         clearInterval(this.#gameLoop);
-        this.#snake =[{x:80,y:0},{x:0,y:0}];
+        this.#snake =[{x:40,y:0},{x:0,y:0}];
         this._renderSnake();
 
         this.#board= Array(this.#n).fill().map(() => Array(this.#m).fill(0));
@@ -31,7 +30,7 @@ class App{
         this.#moveDir = {x:1,y:0};
         
         
-        this.#path = path;        
+        this.#path = generateHamiltonCycle(this.#n,this.#m);        
         this._printPath();
         
         this._spawnApple();
