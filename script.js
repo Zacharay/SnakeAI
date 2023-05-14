@@ -1,4 +1,5 @@
-import generateHamiltonCycle from "./hamiltonianCycleSimple.js";
+import path from "./hamiltonianCycle.js";
+import generateHamiltonCycle from "./hamiltonianCycle.js";
 class App{
     #rectSize = 80;
     #path;
@@ -30,7 +31,7 @@ class App{
         this.#moveDir = {x:1,y:0};
         
         
-        this.#path = generateHamiltonCycle(this.#n,this.#m);        
+        this.#path = path;        
         this._printPath();
         
         this._spawnApple();

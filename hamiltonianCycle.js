@@ -1,18 +1,18 @@
 let edges = []
 const nx = [1,-1,0,0];
 const ny = [0,0,1,-1];
-const n=4,m=4;
+const n=10,m=10;
 
 //Initializing all edges with random weights
-for(let y =1;y<=m/2;y++)
+for(let y =0;y<m/2;y++)
 {
-    for(let x=1;x<=n/2;x++)
+    for(let x=0;x<n/2;x++)
     {
         for(let k = 0;k<4;k++)
         {
             const new_x = x + nx[k];
             const new_y = y + ny[k];
-            if(new_x>=0&&new_x<n&&new_y>=0&&new_y<m)
+            if(new_x>=0&&new_x<n/2&&new_y>=0&&new_y<m/2)
             {
                 const edgeWt = Math.floor(Math.random()*1000);
                 edges.push([{x1:x,y1:y},{x2:new_x,y2:new_y},edgeWt]);
@@ -80,7 +80,18 @@ function un(a,b)
 }
 
 //Kruskal algorithm used for finding Minimum Spanning Tree
-let mst = []
+let mst = [];
+for(let i=0;i<n/2;i++)
+{
+    let temp = [];
+    for(let j =0;j<m/2;j++)
+    {
+        temp.push({canGoDown:false,canGoRight:false});
+    }
+    mst.push(temp);
+}
+console.log(mst);
+
 edges = edges.sort((a,b)=>a[2]>b[2]?1:-1);
 
 for(let i=0;i<edges.length;i++)
@@ -97,67 +108,138 @@ for(let i=0;i<edges.length;i++)
     
     if(s1!=s2)
     {
+        console.log(x1,y1," ",x2,y2);
         un(idx1,idx2);
 
         //edge horizontal
         if(y1==y2)
         {
-            //
-            if(y1==0)
+            console.log('horitozntal');
+            if(x1<x2)
             {
-
+                
+                console.log('h1',y1,x1);
+                mst[y1][x1].canGoRight = true;
+            }
+            else{
+                console.log('h2',y2,x2);
+                
+                mst[y2][x2].canGoRight = true;
             }
         }
         //edge vertical
-        if(x1==x2)
+        else
         {
+            console.log('vertical');
+            if(y1<y2)
+            {
+                console.log('v1',y1,x1);
+                mst[y1][x1].canGoDown = true;
+            }
+            else{
+                console.log('v2',y2,x2);
+                mst[y2][x2].canGoDown = true;
+            }
+        }
+        
+    }
+}
+
+for(let i =0;i<n/2;i++)
+{
+    for(let j =0;j<m/2;j++)
+    {
+        if(mst[i][j].canGoRight)
+        {
+            adj_nodes[i*2][j*2+1].canGoDown = false;
+            adj_nodes[i*2][j*2+2].canGoDown = false;
+
+            adj_nodes[i*2+1][j*2+1].canGoUp = false;
+            adj_nodes[i*2+1][j*2+2].canGoUp = false;
+
 
         }
-        mst.push([{x1,y1},{x2,y2}]);
+        if(mst[i][j].canGoDown)
+        {
+            adj_nodes[i*2+1][j*2].canGoRight = false;
+            adj_nodes[i*2+2][j*2].canGoRight = false;
+
+            adj_nodes[i*2+1][j*2+1].canGoLeft = false;
+            adj_nodes[i*2+2][j*2+1].canGoLeft = false;
+
+
+        }
     }
 }
-// Set the size of the maze
-const width = 10;
-const height = 10;
-
-// Create the 2D array to represent the maze
-const maze = new Array(height);
-for (let i = 0; i < height; i++) {
-  maze[i] = new Array(width).fill('W');
-}
-
-// Choose a random starting cell
-const startX = Math.floor(Math.random() * width);
-const startY = Math.floor(Math.random() * height);
-maze[startY][startX] = 'P';
-
-// Recursively visit neighboring cells
-function visitCell(x, y) {
-  const neighbors = [];
-  if (x > 1 && maze[y][x - 2] === 'W') neighbors.push([x - 2, y]);
-  if (x < width - 2 && maze[y][x + 2] === 'W') neighbors.push([x + 2, y]);
-  if (y > 1 && maze[y - 2][x] === 'W') neighbors.push([x, y - 2]);
-  if (y < height - 2 && maze[y + 2][x] === 'W') neighbors.push([x, y + 2]);
-
-  if (neighbors.length > 0) {
-    const [nextX, nextY] = neighbors[Math.floor(Math.random() * neighbors.length)];
-    maze[nextY][nextX] = 'P';
-    maze[(y + nextY) / 2][(x + nextX) / 2] = 'P';
-    visitCell(nextX, nextY);
-  }
-}
-
-visitCell(startX, startY);
-
-// Convert remaining walls to passages
-for (let y = 1; y < height - 1; y++) {
-  for (let x = 1; x < width - 1; x++) {
-    if (maze[y][x] === 'W') {
-      maze[y][x] = 'P';
+let path = [];
+for(let i =0;i<n;i++)
+{
+    let temp = [];
+    for(let j =0;j<m;j++)
+    {
+        temp.push(0);
     }
-  }
+    path.push(temp);
 }
+let counter = 1;
+let x = 0,y=0;
+let moveDir = {x:1,y:0};
 
-console.log(maze);
-
-
+while(counter<=n*m)
+{
+    x+=moveDir.x;
+    y+=moveDir.y;
+    path[y][x]=counter;
+    //going right
+    if(moveDir.x ==1)
+    {
+        if(adj_nodes[y][x].canGoDown)
+        {
+            moveDir = {x:0,y:1};
+        }
+        else if(!adj_nodes[y][x].canGoRight)
+        {
+            moveDir = {x:0,y:-1};
+        }
+        
+    }
+    //going left
+    else if(moveDir.x ==-1)
+    {
+        if(adj_nodes[y][x].canGoUp)
+        {
+            moveDir = {x:0,y:-1};
+        }
+        else if(!adj_nodes[y][x].canGoLeft)
+        {
+            moveDir = {x:0,y:1};
+        }
+    }
+    //going down
+    else if(moveDir.y ==1)
+    {
+        if(adj_nodes[y][x].canGoLeft)
+        {
+            moveDir = {x:-1,y:0};
+        }
+        else if(!adj_nodes[y][x].canGoDown)
+        {
+            moveDir = {x:1,y:0};
+        }
+    }
+    //going up
+    else if(moveDir.y ==-1)
+    {
+        if(adj_nodes[y][x].canGoRight)
+        {
+            moveDir = {x:1,y:0};
+        }
+        else if(!adj_nodes[y][x].canGoUp)
+        {
+            moveDir = {x:-1,y:0};
+        }
+    }
+    counter++;
+}
+export default path;
+console.log(adj_nodes);
