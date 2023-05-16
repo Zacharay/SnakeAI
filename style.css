@@ -1,54 +1,27 @@
-@import url('https://fonts.googleapis.com/css2?family=Electrolize&display=swap');
+body
+{
 
-body{
-    background-color: #dee2e6;
-    font-family: 'Press Start 2P', cursive;
     display:flex;
     justify-content: center;
     align-items: center;
+    flex-direction: column;
     height:100vh;
 }
-#canvas{
-    background-color:#343a40 ;
-
-
-    image-rendering: -moz-crisp-edges;
-  image-rendering: -webkit-crisp-edges;
-  image-rendering: pixelated;
-  image-rendering: crisp-edges;
+.grid{
+    display:grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-rows: 1fr 1fr 1fr;
+    width:900px;
+    height:900px;
+    gap:2px;
 }
-.container{
-  position:relative;
+.tile{
+    outline:2px solid black;
+    background-size: contain;
+    padding:16px;
 }
-.btn
+.result 
 {
-  cursor: pointer;
-  font-family: 'Electrolize', sans-serif;
-  font-size:64px;
-  background-color:#37b24d;
-  border:4px solid black;
-  border-radius:20px;
-  padding:24px;
-  left:50%;
-  top:50%;
-  transform: translate(-50%,-50%);
-  position:absolute;
-  z-index: 5;
-  transition: 0.2s all;
-}
-.btn:hover{
-  background-color:#40c057;
-}
-
-.overlay{
-  width:100%;
-  height:800px;
-  background-color:rgba(0, 0, 0, 0.657);
-  position: absolute;
-  top:0;
-  left:0;
-}
-.hidden
-{
-  display:none;
+    font-size:64px;
+    font-family:sans-serif;
 }
