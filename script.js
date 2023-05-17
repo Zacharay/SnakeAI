@@ -1,4 +1,5 @@
 import generateHamiltonCycle from "./hamiltonianCycle.js";
+//import generateHamiltonCycle from "./hamiltonianCycleSimple.js";
 class App{
     #rectSize = 40;
     #path;
@@ -31,7 +32,7 @@ class App{
         
         
         this.#path = generateHamiltonCycle(this.#n,this.#m);        
-        this._printPath();
+        //this._printPath();
         
         this._spawnApple();
         
@@ -72,7 +73,7 @@ class App{
             const {x,y} = el;
             this.#ctx.fillStyle = "#94d82d";
             this.#ctx.beginPath();
-            this.#ctx.rect(x+2,y+2,this.#rectSize-2,this.#rectSize-2);
+            this.#ctx.rect(x+4,y+4,this.#rectSize-4,this.#rectSize-4);
             this.#ctx.fill();
             
         });
@@ -143,7 +144,7 @@ class App{
         let legalShortcut = distToTail - this.#snake.length -3;
         if(legalShortcut<0)legalShortcut=0;
         
-
+        
        
         let desiredShortcut = distToApple;
         if(legalShortcut>desiredShortcut)
@@ -199,7 +200,112 @@ class App{
                 dist = nodeDist;
             }
         }
+        let type=0;
+        
+        if(this.#moveDir.x!=bestDir.x&&this.#moveDir.y!=bestDir.y)
+        {
+            //right to down
+            if(this.#moveDir.x==1&&bestDir.y==1)
+            {
+                console.log("right down")
+                type=3;
+            }
+            //right to up
+            if(this.#moveDir.x==1&&bestDir.y==-1)
+            {
+                console.log("right up")
+                type=4;
+            }
+            //down to left
+            if(this.#moveDir.y==1&&bestDir.x==-1)
+            {
+                console.log("down left")
+                type=4;
+            }
+            //down to right
+            if(this.#moveDir.y==1&&bestDir.x==1)
+            {
+                console.log("down right")
+                type=5;
+            }
+            //left to down
+            if(this.#moveDir.x==-1&&bestDir.y==1)
+            {
+                console.log("left down")
+                type=6;
+            }
+            //left to up
+            if(this.#moveDir.x==-1&&bestDir.y==-1)
+            {
+                console.log("left down")
+                type=5;
+            }
+            //up to right
+            if(this.#moveDir.y==-1&&bestDir.x==1)
+            {
+                console.log("up right")
+                type=6;
+            }
+            //up to left
+            if(this.#moveDir.y==-1&&bestDir.x==-1)
+            {
+                console.log("up left")
+                type=3;
+            }
+
+        }
+        else{
+            if(this.#moveDir.x==1||this.#moveDir.x==-1)
+            {
+                type = 1;
+            }
+            else{
+                type = 2;
+            }
+        }
+        if(type==0)type=1;
+
+        
         this.#moveDir = bestDir;        
+        return type;
+    }
+    _drawSnake(type,x,y)
+    {
+        const margin = 2;
+        this.#ctx.fillStyle="#94d82d";  
+        this.#ctx.beginPath();
+        //=
+        if(type==1)
+        {
+            this.#ctx.rect(x,y+margin,this.#rectSize+margin,this.#rectSize-2*margin);
+        }
+        //||
+        if(type==2)
+        {
+            this.#ctx.rect(x+margin,y,this.#rectSize-margin*2,this.#rectSize);
+        }
+        //``|
+        if(type==3)
+        {
+            this.#ctx.rect(x,y+margin,this.#rectSize-margin,this.#rectSize);  
+        }
+        //_|
+        if(type==4)
+        {
+            this.#ctx.rect(x,y,this.#rectSize-margin,this.#rectSize-margin);  
+        }
+        //|_
+        if(type==5)
+        {
+            this.#ctx.rect(x+margin,y,this.#rectSize-margin,this.#rectSize-margin); 
+        }
+        //|``
+        if(type==6)
+        {
+            this.#ctx.rect(x+margin,y+margin,this.#rectSize-margin,this.#rectSize-margin); 
+        }
+        
+        this.#ctx.fill();
     }
     
     _moveSnake()
@@ -223,7 +329,7 @@ class App{
         this.#snake.unshift({x:new_head_x,y:new_head_y});
         
         //find the best direction for snake to go
-        this._changeDir(new_head_idx_x,new_head_idx_y);
+        const type= this._changeDir(new_head_idx_x,new_head_idx_y);
 
         if(!this._eatApple(new_head_x,new_head_y))
         {
@@ -236,7 +342,7 @@ class App{
             this.#ctx.beginPath();
             
             this.#ctx.clearRect(tail_x,tail_y,this.#rectSize+2,this.#rectSize+2);
-            this._fixNumber(tail_x,tail_y);
+            //this._fixNumber(tail_x,tail_y);
         }
         else{
             this.#numOfEmptySquares--;
@@ -248,10 +354,7 @@ class App{
             }
         }
        
-        this.#ctx.fillStyle=this.#ctx.fillStyle = "#94d82d";  
-        this.#ctx.beginPath();
-        this.#ctx.rect(new_head_x+4,new_head_y+4,this.#rectSize-4,this.#rectSize-4);
-        this.#ctx.fill();
+        this._drawSnake(type,new_head_x,new_head_y)
         
         
     }

@@ -26,7 +26,7 @@ function getEdges(n,m)
     return edges;
 }
 
-//Disjoint Union Set used for detecting a cycle in a graph
+//Disjoint Union Set for detecting a cycle in a graph
      
 function find(a,rep)
 {
