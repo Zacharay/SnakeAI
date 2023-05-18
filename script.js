@@ -22,7 +22,7 @@ class App{
     _init()
     {
         clearInterval(this.#gameLoop);
-        this.#snake =[{x:40,y:0},{x:0,y:0}];
+        this.#snake =[{x:40,y:0,type:1},{x:0,y:0,type:1}];
         this._renderSnake();
 
         this.#board= Array(this.#n).fill().map(() => Array(this.#m).fill(0));
@@ -68,13 +68,11 @@ class App{
     }
     _renderSnake()
     {
-        this.#ctx.clearRect(0,0,800,800);
+ 
         this.#snake.forEach(el => {
-            const {x,y} = el;
-            this.#ctx.fillStyle = "#94d82d";
-            this.#ctx.beginPath();
-            this.#ctx.rect(x+4,y+4,this.#rectSize-4,this.#rectSize-4);
-            this.#ctx.fill();
+            const {x,y,type} = el;
+            
+            this._drawSnake(type,x,y);
             
         });
         
@@ -207,55 +205,54 @@ class App{
             //right to down
             if(this.#moveDir.x==1&&bestDir.y==1)
             {
-                console.log("right down")
                 type=3;
             }
             //right to up
             if(this.#moveDir.x==1&&bestDir.y==-1)
             {
-                console.log("right up")
+                
                 type=4;
             }
             //down to left
             if(this.#moveDir.y==1&&bestDir.x==-1)
             {
-                console.log("down left")
+               
                 type=4;
             }
             //down to right
             if(this.#moveDir.y==1&&bestDir.x==1)
             {
-                console.log("down right")
+               
                 type=5;
             }
             //left to down
             if(this.#moveDir.x==-1&&bestDir.y==1)
             {
-                console.log("left down")
+                
                 type=6;
             }
             //left to up
             if(this.#moveDir.x==-1&&bestDir.y==-1)
             {
-                console.log("left down")
+                
                 type=5;
             }
             //up to right
             if(this.#moveDir.y==-1&&bestDir.x==1)
             {
-                console.log("up right")
+                
                 type=6;
             }
             //up to left
             if(this.#moveDir.y==-1&&bestDir.x==-1)
             {
-                console.log("up left")
+              
                 type=3;
             }
 
         }
         else{
-            if(this.#moveDir.x==1||this.#moveDir.x==-1)
+            if(this.#moveDir.x==1||this.#moveDir.x ==-1)
             {
                 type = 1;
             }
@@ -263,7 +260,7 @@ class App{
                 type = 2;
             }
         }
-        if(type==0)type=1;
+    
 
         
         this.#moveDir = bestDir;        
@@ -271,40 +268,42 @@ class App{
     }
     _drawSnake(type,x,y)
     {
-        const margin = 2;
+        const margin =1;
         this.#ctx.fillStyle="#94d82d";  
         this.#ctx.beginPath();
         //=
         if(type==1)
-        {
-            this.#ctx.rect(x,y+margin,this.#rectSize+margin,this.#rectSize-2*margin);
+        {  
+            this.#ctx.rect(x,y+margin,this.#rectSize,this.#rectSize-2*margin);
         }
         //||
         if(type==2)
         {
+
             this.#ctx.rect(x+margin,y,this.#rectSize-margin*2,this.#rectSize);
         }
         //``|
         if(type==3)
-        {
-            this.#ctx.rect(x,y+margin,this.#rectSize-margin,this.#rectSize);  
+        {             
+            this.#ctx.rect(x,y+margin,this.#rectSize-margin,this.#rectSize-margin);  
         }
         //_|
         if(type==4)
-        {
+        {             
             this.#ctx.rect(x,y,this.#rectSize-margin,this.#rectSize-margin);  
         }
         //|_
         if(type==5)
-        {
+        {            
             this.#ctx.rect(x+margin,y,this.#rectSize-margin,this.#rectSize-margin); 
         }
         //|``
         if(type==6)
-        {
+        {            
             this.#ctx.rect(x+margin,y+margin,this.#rectSize-margin,this.#rectSize-margin); 
         }
-        
+
+
         this.#ctx.fill();
     }
     
@@ -326,11 +325,13 @@ class App{
         const new_head_idx_y = new_head_y/this.#rectSize;
         this.#board[new_head_idx_y][new_head_idx_x]=2;
         this.#board[head_idx_y][head_idx_x]=1;
-        this.#snake.unshift({x:new_head_x,y:new_head_y});
+        
         
         //find the best direction for snake to go
         const type= this._changeDir(new_head_idx_x,new_head_idx_y);
-
+        this.#snake.unshift({x:new_head_x,y:new_head_y,type});
+        this._renderSnake();
+        
         if(!this._eatApple(new_head_x,new_head_y))
         {
             //making snake tail hidden
@@ -341,7 +342,7 @@ class App{
 
             this.#ctx.beginPath();
             
-            this.#ctx.clearRect(tail_x,tail_y,this.#rectSize+2,this.#rectSize+2);
+            this.#ctx.clearRect(tail_x,tail_y,this.#rectSize,this.#rectSize);
             //this._fixNumber(tail_x,tail_y);
         }
         else{
@@ -354,7 +355,7 @@ class App{
             }
         }
        
-        this._drawSnake(type,new_head_x,new_head_y)
+        
         
         
     }
