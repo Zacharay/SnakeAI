@@ -385,6 +385,7 @@ class App{
         restartBtn.addEventListener('click',()=>{
             restartBtn.classList.add('hidden');
             overlay.classList.add('hidden');
+            this.#ctx.clearRect(0,0,1000,1000)
             this._init();
             
             
