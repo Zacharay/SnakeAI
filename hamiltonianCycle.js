@@ -49,21 +49,22 @@ function kruskalMST(n,m,edges)
 {
     //Initializing mst 2d array with 0
     let mst = [];
-    for(let i=0;i<n;i++)
+    for(let i=0;i<m;i++)
     {
         let temp = [];
-        for(let j =0;j<m;j++)
+        for(let j =0;j<n;j++)
         {
             temp.push({canGoDown:false,canGoRight:false});
         }
         mst.push(temp);
     }
-
+   
     //Initializing rep array for disjoint union set
     let rep =[];
-    for(let i=0;i<n*m+3;i++){
+    for(let i=0;i<n*m*2;i++){
         rep.push(-1);
     }
+
    
 
 
@@ -79,7 +80,7 @@ function kruskalMST(n,m,edges)
 
         const s1 = find(idx1,rep);
         const s2 = find(idx2,rep);
-      
+       
         if(s1!=s2)
         {
             un(idx1,idx2,rep);
@@ -117,10 +118,10 @@ function getNodes(n,m,mst)
     //this array will store all possible moves for each node
     let adj_nodes=[];
 
-    for(let i=0;i<n;i++)
+    for(let i=0;i<m;i++)
     {
         adj_nodes[i]=[];
-        for(let j=0;j<m;j++)
+        for(let j=0;j<n;j++)
         {
             
             let canGoRight = false;
@@ -131,7 +132,7 @@ function getNodes(n,m,mst)
             {
                 canGoUp = true;
             }
-            if(i<n-1)
+            if(i<m-1)
             {
                 canGoDown=true;
             }
@@ -139,7 +140,7 @@ function getNodes(n,m,mst)
             {
                 canGoLeft = true;
             }
-            if(j<m-1)
+            if(j<n-1)
             {
                 canGoRight =true;
             }
@@ -148,9 +149,9 @@ function getNodes(n,m,mst)
         }
     }
 
-    for(let i =0;i<n/2;i++)
+    for(let i =0;i<m/2;i++)
     {
-        for(let j =0;j<m/2;j++)
+        for(let j =0;j<n/2;j++)
         {
             if(mst[i][j].canGoRight)
             {
@@ -179,11 +180,12 @@ function getNodes(n,m,mst)
 
 function getPath(n,m,nodes)
 {
+  
     let path = [];
-    for(let i =0;i<n;i++)
+    for(let i =0;i<m;i++)
     {
         let temp = [];
-        for(let j =0;j<m;j++)
+        for(let j =0;j<n;j++)
         {
             temp.push(0);
         }
@@ -197,6 +199,7 @@ function getPath(n,m,nodes)
     {
         x+=moveDir.x;
         y+=moveDir.y;
+
         path[y][x]=counter;
         //going right
         if(moveDir.x ==1)
@@ -267,6 +270,5 @@ function generateHamiltonCycle(n,m)
 
     return path;
 }
-
 
 export default generateHamiltonCycle;

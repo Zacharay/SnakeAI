@@ -1,23 +1,32 @@
 @import url('https://fonts.googleapis.com/css2?family=Electrolize&display=swap');
-
+*{
+  margin:0;
+  padding:0;
+  box-sizing: border-box;
+}
 body{
     background-color: #dee2e6;
     display:flex;
     justify-content: center;
     align-items: center;
     height:100vh;
+    overflow: hidden;
 }
 #canvas{
     background-color:#343a40 ;
-
-
+    
+  
     image-rendering: -moz-crisp-edges;
-  image-rendering: -webkit-crisp-edges;
-  image-rendering: pixelated;
-  image-rendering: crisp-edges;
+    image-rendering: -webkit-crisp-edges;
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
 }
+
+
 .container{
   position:relative;
+  width:800px;
+  height:800px;
 }
 .btn
 {
@@ -50,4 +59,26 @@ body{
 .hidden
 {
   display:none;
+}
+
+@media (max-width:850px)
+{
+  .container{
+    width:600px;
+    height:600px;
+  }
+}
+@media (max-width:650px)
+{
+  .container{
+    width:400px;
+    height:400px;
+  }
+}
+@media (max-width:450px)
+{
+  .container{
+    width:300px;
+    height:300px;
+  }
 }

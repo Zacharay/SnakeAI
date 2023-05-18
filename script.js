@@ -1,7 +1,7 @@
 import generateHamiltonCycle from "./hamiltonianCycle.js";
 //import generateHamiltonCycle from "./hamiltonianCycleSimple.js";
 class App{
-    #rectSize = 40;
+    #rectSize;
     #path;
     #appleCords;
     #canvas;
@@ -13,16 +13,25 @@ class App{
     #moveDir;
     #gameLoop;
     #numOfEmptySquares;
+    #container;
     constructor(){
+        this.#container = document.querySelector(".container");
         this.#canvas = document.getElementById("canvas");
         this.#ctx = this.#canvas.getContext("2d");
+
+        
+        this.#canvas.height = this.#container.offsetHeight;
+        this.#canvas.width =this.#container.offsetWidth;
+
+       this.#rectSize = this.#container.offsetWidth/this.#n;
+   
         this._init();
         
     }
     _init()
     {
         clearInterval(this.#gameLoop);
-        this.#snake =[{x:40,y:0,type:1},{x:0,y:0,type:1}];
+        this.#snake =[{x:this.#rectSize,y:0,type:1},{x:0,y:0,type:1}];
         this._renderSnake();
 
         this.#board= Array(this.#n).fill().map(() => Array(this.#m).fill(0));
@@ -31,7 +40,8 @@ class App{
         this.#moveDir = {x:1,y:0};
         
         
-        this.#path = generateHamiltonCycle(this.#n,this.#m);        
+        this.#path = generateHamiltonCycle(this.#n,this.#m);    
+  
         //this._printPath();
         
         this._spawnApple();
@@ -323,6 +333,8 @@ class App{
         const new_head_y = head_y+this.#moveDir.y*this.#rectSize;
         const new_head_idx_x = new_head_x/this.#rectSize;
         const new_head_idx_y = new_head_y/this.#rectSize;
+
+       
         this.#board[new_head_idx_y][new_head_idx_x]=2;
         this.#board[head_idx_y][head_idx_x]=1;
         
